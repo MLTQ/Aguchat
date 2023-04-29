@@ -10,3 +10,7 @@ obj/
 UserSettings/
 
 .vsconfig
+
+models/
+
+.vscode/
