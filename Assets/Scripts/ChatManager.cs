@@ -21,7 +21,8 @@ public class ChatManager : MonoBehaviour
 {
     public static bool RemoteCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) => true;
 
-    public string apiUrl = "192.168.0.77:7412/v1/completions";
+    public string apiUrl = "https://api.openai.com/v1/chat/completions";//"192.168.0.77:7412/v1/completions";
+    public string apiKey;
     public InputField inputField;
     public TMP_Text chatLog;
     public ScrollRect scrollRect;
@@ -38,36 +39,41 @@ void Start()
     //public static bool RemoteCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) => true;
 
 
+    public void ClickButton(){
+        Debug.Log("cliiiiiiick");
+    }
+
     public void SendChatMessage()
     {
         StartCoroutine(SendMessageCoroutine(inputField.text));
         inputField.text = "";
         inputField.DeactivateInputField();
         isTyping = false;
-        EnableInput();
     }
     
     private void Update()
     {
     // Check if Shift + Space is pressed
-    if (Keyboard.current.tabKey.wasPressedThisFrame)
+     if (Keyboard.current.spaceKey.isPressed && Keyboard.current.tabKey.wasPressedThisFrame)
     {
+        Debug.LogWarning("Keys pressed");
         // Toggle the isTyping state
         isTyping = !isTyping;
-
+ 
         // Enable or disable input based on the isTyping state
         if (isTyping)
         {
             // Enable typing in the input field
             inputField.Select();
+            Debug.LogWarning("passed selection");
             inputField.ActivateInputField();
-            DisableInput(); // Disable character and camera controls
+            
         }
         else
         {
             // Disable typing in the input field
             inputField.DeactivateInputField();
-            EnableInput(); // Enable character and camera controls
+            
         }
     }
 }
@@ -79,24 +85,6 @@ private bool ServerCertificateValidationCallback(object sender, X509Certificate 
 }
 #endif
 
-
-    public void EnableInput()
-    {
-        FindObjectOfType<ThirdPersonController>().inputEnabled = true;
-
-        // Lock and hide the cursor
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-    }
-
-    public void DisableInput()
-    {
-        FindObjectOfType<ThirdPersonController>().inputEnabled = false;
-
-        // Unlock and show the cursor
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
-    }
     
 public class AIResponse
 {
@@ -152,7 +140,11 @@ private IEnumerator SendMessageCoroutine(string message)
         Uri = apiUrl,
         Method = "POST",
         ContentType = "application/json",
-        BodyString = json
+        BodyString = json,
+        Headers = new Dictionary<string, string>
+    {
+        { "Authorization", apiKey }
+    }
     })
     .Then(response =>
 {

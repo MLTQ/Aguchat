@@ -44,6 +44,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   apiUrl: http://192.168.0.77:7412/v1/completions
+  apiKey: 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
   inputField: {fileID: 0}
   chatLog: {fileID: 0}
   scrollRect: {fileID: 0}
